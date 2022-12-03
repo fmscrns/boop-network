@@ -48,7 +48,7 @@ def detclas(
     cv2.imshow(p, im0)
     cv2.waitKey(10000)
 
-detect(
+detclas(
     weights="weights.pt",
     source="dog.jpeg",
     imgsz=640,
