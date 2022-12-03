@@ -6,7 +6,7 @@ from utils.general import non_max_suppression, scale_coords
 from utils.plots import Annotator, colors
 
 @torch.no_grad()
-def detect(
+def detclas(
     weights,
     source,
     imgsz=640,
