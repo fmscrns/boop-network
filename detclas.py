@@ -18,7 +18,6 @@ def detclas(
     model = torch.load(weights, map_location=device)
     model = (model['model']).float()
     names = model.names
-    stride = model.stride
 
     img0 = cv2.imread(str(source))
     img = letterbox(img0, imgsz)[0]
