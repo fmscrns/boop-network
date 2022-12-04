@@ -1,7 +1,7 @@
 import torch
 import cv2
 import numpy as np
-from utils.augmentations import letterbox
+from utils.augmentations import letterbox, ResizeWithAspectRatio
 from utils.general import non_max_suppression, scale_coords
 from utils.plots import Annotator, colors
 
@@ -35,7 +35,7 @@ def detclas(
 
     det = pred[0]
     p, im0 = str(source), img0.copy()
-    annotator = Annotator(im0, line_width=3, example=str(names))
+    annotator = Annotator(im0, line_width=15, example=str(names))
     if len(det):
         det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
@@ -43,15 +43,16 @@ def detclas(
             c = int(cls)
             label = f'{names[c]} {conf:.2f}'
             annotator.box_label(xyxy, label, color=colors(c, True))
-
+    
     im0 = annotator.result()
+    im0 = ResizeWithAspectRatio(im0, imgsz)
     cv2.imshow(p, im0)
     cv2.waitKey(10000)
 
 detclas(
     weights="weights.pt",
-    source="dog.jpeg",
-    imgsz=640,
+    source="dog3.jpg",
+    imgsz=480,
     conf_thres=0.25,
     iou_thres=0.45,
     max_det=1000,
