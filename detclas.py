@@ -36,7 +36,6 @@ def detclas(
     annotator = Annotator(im0, line_width=15, example=str(names))
     if len(det):
         det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
-
         for *xyxy, conf, cls in reversed(det):
             c = int(cls)
             label = f'{names[c]} {conf:.2f}'
