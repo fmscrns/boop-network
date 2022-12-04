@@ -9,7 +9,6 @@ from utils.plots import Annotator, colors
 def detclas(
     weights,
     source,
-    imgsz=640,
     conf_thres=0.25,
     iou_thres=0.45,
     max_det=1000,
@@ -20,7 +19,7 @@ def detclas(
     names = model.names
 
     img0 = cv2.imread(str(source))
-    img = letterbox(img0, imgsz)[0]
+    img = letterbox(img0)[0]
     img = img.transpose((2, 0, 1))[::-1]
     img = np.ascontiguousarray(img)
 
@@ -30,11 +29,10 @@ def detclas(
     img = img[None]
 
     pred = model(img)
-
     pred = non_max_suppression(pred[0], conf_thres, iou_thres, max_det=max_det)
-
     det = pred[0]
-    p, im0 = str(source), img0.copy()
+    
+    im0 = img0.copy()
     annotator = Annotator(im0, line_width=15, example=str(names))
     if len(det):
         det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -44,15 +42,14 @@ def detclas(
             label = f'{names[c]} {conf:.2f}'
             annotator.box_label(xyxy, label, color=colors(c, True))
     
-    im0 = annotator.result()
-    im0 = ResizeWithAspectRatio(im0, imgsz)
-    cv2.imshow(p, im0)
+    anot_img = annotator.result()
+    anot_img = ResizeWithAspectRatio(im0, 640)
+    cv2.imshow(str(source), anot_img)
     cv2.waitKey(10000)
 
 detclas(
     weights="weights.pt",
-    source="dog3.jpg",
-    imgsz=480,
+    source="dog.jpg",
     conf_thres=0.25,
     iou_thres=0.45,
     max_det=1000,
