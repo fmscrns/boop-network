@@ -28,9 +28,8 @@ def detclas(
     img = img[None]
 
     pred = model(img)
-    pred = non_max_suppression(pred[0], conf_thres, iou_thres, max_det=max_det)
-    det = pred[0]
-    
+    det = non_max_suppression(pred[0], conf_thres, iou_thres, max_det=max_det)[0]
+
     im0 = img0.copy()
     names = model.names
     annotator = Annotator(im0, line_width=15, example=str(names))
