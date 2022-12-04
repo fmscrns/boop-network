@@ -16,7 +16,6 @@ def detclas(
 ):
     model = torch.load(weights, map_location=device)
     model = (model['model']).float()
-    names = model.names
 
     img0 = cv2.imread(str(source))
     img = letterbox(img0)[0]
@@ -33,6 +32,7 @@ def detclas(
     det = pred[0]
     
     im0 = img0.copy()
+    names = model.names
     annotator = Annotator(im0, line_width=15, example=str(names))
     if len(det):
         det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
