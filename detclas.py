@@ -13,6 +13,7 @@ def detclas(
     iou_thres=0.45,
     max_det=1000,
     device='',
+    line_width=15
 ):
     model = torch.load(weights, map_location=device)
     model = (model['model']).float()
@@ -32,7 +33,7 @@ def detclas(
 
     im0 = img0.copy()
     names = model.names
-    annotator = Annotator(im0, line_width=15, example=str(names))
+    annotator = Annotator(im0, line_width=line_width, example=str(names))
     if len(det):
         det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
         for *xyxy, conf, cls in reversed(det):
@@ -51,5 +52,6 @@ detclas(
     conf_thres=0.25,
     iou_thres=0.45,
     max_det=1000,
-    device="cpu"
+    device="cpu",
+    line_width=2
 )
