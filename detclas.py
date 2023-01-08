@@ -1,6 +1,7 @@
 import torch
 import cv2
 import numpy as np
+from pathlib import Path
 from utils.augmentations import letterbox, ResizeWithAspectRatio
 from utils.general import non_max_suppression, scale_coords
 from utils.plots import Annotator, colors
@@ -46,12 +47,20 @@ def detclas(
     cv2.imshow(str(source), anot_img)
     cv2.waitKey(10000)
 
-detclas(
-    weights="weights.pt",
-    source="dog.jpg",
-    conf_thres=0.25,
-    iou_thres=0.45,
-    max_det=1000,
-    device="cpu",
-    line_width=2
-)
+if __name__ == "__main__":
+    dog_pname = input("Enter the full pathname of the image with dog:")
+    
+    dog_file = Path(dog_pname)
+    if dog_file.is_file():
+        detclas(
+            weights="weights.pt",
+            source=r"{}".format(dog_pname),
+            conf_thres=0.25,
+            iou_thres=0.45,
+            max_det=1000,
+            device="cpu",
+            line_width=2
+        )
+
+    else:
+        print("Error on getting file. No such file exists.")
