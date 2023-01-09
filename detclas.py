@@ -7,11 +7,11 @@ from utils.general import non_max_suppression as nms, scale_coords
 from utils.plots import Annotator, colors
 
 @torch.no_grad()
-def detclas(weights, source, conf_thres=0.25, iou_thres=0.45, max_det=1000, device='', line_width=15):
+def detclas(weights, src, conf_thres, iou_thres, max_det, device, line_width):
     yolo = torch.load(weights, map_location=device)
     yolo_32bit = (yolo['model']).float()
 
-    img_to_numpyArr = cv2.imread(str(source))
+    img_to_numpyArr = cv2.imread(str(src))
     numpyArr_padded = letterbox(img_to_numpyArr)[0]
     numpyArr_channelFix = numpyArr_padded.transpose((2, 0, 1))[::-1]
     numpyArr_contig = np.ascontiguousarray(numpyArr_channelFix)
@@ -36,7 +36,7 @@ def detclas(weights, source, conf_thres=0.25, iou_thres=0.45, max_det=1000, devi
     
     annot = annotator.result()
     annot = ResizeWithAspectRatio(im0, 640)
-    cv2.imshow(str(source), annot)
+    cv2.imshow(str(src), annot)
     cv2.waitKey(0)
 
 if __name__ == "__main__":
@@ -44,15 +44,7 @@ if __name__ == "__main__":
     
     dog_file = Path(dog_pname)
     if dog_file.is_file():
-        detclas(
-            weights="weights.pt",
-            source=r"{}".format(dog_pname),
-            conf_thres=0.25,
-            iou_thres=0.45,
-            max_det=1000,
-            device="cpu",
-            line_width=2
-        )
+        detclas("weights.pt", r"{}".format(dog_pname), 0.25, 0.45, 5, "cpu", 2)
 
     else:
         print("Error on getting file. No such file exists.")
