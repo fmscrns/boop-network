@@ -16,35 +16,35 @@ def detclas(
     device='',
     line_width=15
 ):
-    model = torch.load(weights, map_location=device)
-    model = (model['model']).float()
+    yolo = torch.load(weights, map_location=device)
+    yolo_32bit = (yolo['model']).float()
 
-    img0 = cv2.imread(str(source))
-    img = letterbox(img0)[0]
-    img = img.transpose((2, 0, 1))[::-1]
-    img = np.ascontiguousarray(img)
+    img_to_numpyArr = cv2.imread(str(source))
+    numpyArr_padded = letterbox(img_to_numpyArr)[0]
+    numpyArr_channelFix = numpyArr_padded.transpose((2, 0, 1))[::-1]
+    numpyArr_contig = np.ascontiguousarray(numpyArr_channelFix)
 
-    img = torch.from_numpy(img).to(device)
-    img = img.float()
-    img /= 255
-    img = img[None]
+    numpyArr_to_tensor = torch.from_numpy(numpyArr_contig).to(device)
+    tensor_32bit = numpyArr_to_tensor.float()
+    tensor_normalized = tensor_32bit/255
+    tensor_addedBatchDim = tensor_normalized[None]
 
-    pred = model(img)
+    pred = yolo_32bit(tensor_addedBatchDim)
     det = non_max_suppression(pred[0], conf_thres, iou_thres, max_det=max_det)[0]
 
-    im0 = img0.copy()
-    names = model.names
-    annotator = Annotator(im0, line_width=line_width, example=str(names))
+    im0 = img_to_numpyArr.copy()
+    classes = yolo_32bit.names
+    annotator = Annotator(im0, line_width=line_width, example=str(classes))
     if len(det):
-        det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
+        det[:, :4] = scale_coords(tensor_addedBatchDim.shape[2:], det[:, :4], im0.shape).round()
         for *xyxy, conf, cls in reversed(det):
             c = int(cls)
-            label = f'{names[c]} {conf:.2f}'
+            label = f'{classes[c]} {conf:.2f}'
             annotator.box_label(xyxy, label, color=colors(c, True))
     
-    anot_img = annotator.result()
-    anot_img = ResizeWithAspectRatio(im0, 640)
-    cv2.imshow(str(source), anot_img)
+    annot = annotator.result()
+    annot = ResizeWithAspectRatio(im0, 640)
+    cv2.imshow(str(source), annot)
     cv2.waitKey(0)
 
 if __name__ == "__main__":
