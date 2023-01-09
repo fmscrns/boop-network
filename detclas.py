@@ -3,19 +3,11 @@ import cv2
 import numpy as np
 from pathlib import Path
 from utils.augmentations import letterbox, ResizeWithAspectRatio
-from utils.general import non_max_suppression, scale_coords
+from utils.general import non_max_suppression as nms, scale_coords
 from utils.plots import Annotator, colors
 
 @torch.no_grad()
-def detclas(
-    weights,
-    source,
-    conf_thres=0.25,
-    iou_thres=0.45,
-    max_det=1000,
-    device='',
-    line_width=15
-):
+def detclas(weights, source, conf_thres=0.25, iou_thres=0.45, max_det=1000, device='', line_width=15):
     yolo = torch.load(weights, map_location=device)
     yolo_32bit = (yolo['model']).float()
 
@@ -30,7 +22,7 @@ def detclas(
     tensor_addedBatchDim = tensor_normalized[None]
 
     pred = yolo_32bit(tensor_addedBatchDim)
-    det = non_max_suppression(pred[0], conf_thres, iou_thres, max_det=max_det)[0]
+    det = nms(pred[0], conf_thres, iou_thres, max_det=max_det)[0]
 
     im0 = img_to_numpyArr.copy()
     classes = yolo_32bit.names
