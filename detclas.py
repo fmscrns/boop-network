@@ -45,7 +45,7 @@ def detclas(
     anot_img = annotator.result()
     anot_img = ResizeWithAspectRatio(im0, 640)
     cv2.imshow(str(source), anot_img)
-    cv2.waitKey(10000)
+    cv2.waitKey(0)
 
 if __name__ == "__main__":
     dog_pname = input("Enter the full pathname of the image with dog:")
